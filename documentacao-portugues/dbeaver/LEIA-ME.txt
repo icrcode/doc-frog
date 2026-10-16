@@ -1,0 +1,8 @@
+A documentação oficial do DBeaver não possui tradução oficial para o português.
+
+O PDF original (em inglês) está em:
+  documentacao-original/dbeaver/
+
+Fonte oficial: https://dbeaver.com/docs/dbeaver/
+
+Dica: use o buscador do index.html — ele mostra a página exata do PDF em inglês.

@@ -1,0 +1,8 @@
+A documentação oficial do MySQL Workbench não possui tradução oficial para o português.
+
+O PDF original (em inglês) está em:
+  documentacao-original/mysql-workbench/
+
+Fonte oficial: https://dev.mysql.com/doc/workbench/en/
+
+Dica: use o buscador do index.html — ele mostra a página exata do PDF em inglês.

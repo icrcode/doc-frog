@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>doc-frog — SENAI</title>
+<link rel="icon" type="image/png" href="assets/icon.png">
+<link rel="apple-touch-icon" href="assets/icon.png">
+<style>
+  :root {
+    --blue: #003DA5; --red: #19e82a; --navy: #001F5A;
+    --bg: #f5f5f7; --panel: #ffffff; --text: #1d1d1f; --muted: #6e6e73; --hair: rgba(0,0,0,.08);
+    --fill: rgba(0,0,0,.05); --fill-2: rgba(0,0,0,.08); --nav: rgba(255,255,255,.72);
+    --brand: #003DA5; --accent: #19e82a; --focus: rgba(0,61,165,.22);
+    --mark: rgba(0,61,165,.12); --mark-text: #003DA5;
+    --shadow: 0 1px 2px rgba(0,0,0,.04), 0 8px 28px rgba(0,0,0,.06);
+    --shadow-hover: 0 2px 4px rgba(0,0,0,.05), 0 14px 36px rgba(0,0,0,.10);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #000000; --panel: #1c1c1e; --text: #f5f5f7; --muted: #98989d; --hair: rgba(255,255,255,.1);
+      --fill: rgba(255,255,255,.08); --fill-2: rgba(255,255,255,.14); --nav: rgba(22,22,23,.72);
+      --brand: #3d7cf0; --accent: #19e82a; --focus: rgba(61,124,240,.35);
+      --mark: rgba(61,124,240,.22); --mark-text: #8fb4ff;
+      --shadow: none; --shadow-hover: none;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { overflow-x: hidden; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 15px/1.47 "Segoe UI Variable Text", "Segoe UI", -apple-system, BlinkMacSystemFont, "SF Pro Text", Helvetica, Arial, sans-serif;
+         -webkit-font-smoothing: antialiased; letter-spacing: -.01em; }
+  button, input, select, code, kbd { font-family: inherit; }
+  a { color: var(--brand); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  [hidden] { display: none !important; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 20px; }
+
+  /* barra superior translúcida */
+  .topbar { position: sticky; top: 0; z-index: 10; background: var(--nav); border-bottom: 1px solid var(--hair);
+            backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); }
+  .topbar .wrap { display: flex; align-items: center; justify-content: space-between; height: 52px; }
+  .senai-logo { display: block; height: 20px; width: auto; }
+  .topbar .sys { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px; color: var(--text); }
+  .topbar .sys img { width: 26px; height: 26px; border-radius: 50%; }
+
+  /* destaque */
+  header.wrap { padding: 64px 20px 36px; text-align: center; }
+  .hero-icon { display: block; width: 92px; height: 92px; margin: 0 auto 22px; border-radius: 50%;
+               box-shadow: 0 10px 30px rgba(0,31,90,.18); }
+  h1 { margin: 0 0 12px; font-size: clamp(38px, 7vw, 56px); font-weight: 700; letter-spacing: -.035em; line-height: 1.05; color: var(--text); }
+  h1 span { color: var(--accent); }
+  .sub { color: var(--muted); margin: 0 auto; max-width: 640px; font-size: 19px; line-height: 1.4; letter-spacing: -.015em; }
+  .sub + .sub { margin-top: 6px; font-size: 15px; }
+
+  /* busca */
+  .search { position: sticky; top: 52px; z-index: 5; padding: 14px 0 12px; background: var(--bg); }
+  .box { display: flex; gap: 10px; align-items: center; background: var(--panel); border-radius: 14px;
+         padding: 4px 10px 4px 16px; box-shadow: var(--shadow); border: 1px solid var(--hair); transition: box-shadow .2s; }
+  .box:focus-within { box-shadow: 0 0 0 4px var(--focus); border-color: var(--brand); }
+  .box svg { flex: none; color: var(--muted); }
+  #q { flex: 1; border: 0; outline: 0; background: transparent; color: var(--text); font-size: 18px; padding: 12px 0; min-width: 0; letter-spacing: -.01em; }
+  #q::placeholder { color: var(--muted); opacity: .8; }
+  #clear { border: 0; background: var(--fill-2); color: var(--muted); width: 22px; height: 22px; border-radius: 50%;
+           font-size: 11px; line-height: 22px; padding: 0; cursor: pointer; visibility: hidden; }
+  .row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 12px; }
+  .chip { border: 0; background: var(--fill); color: var(--text); border-radius: 999px; padding: 6px 14px;
+          font-size: 13px; font-weight: 500; cursor: pointer; transition: background .15s; }
+  .chip:hover { background: var(--fill-2); }
+  .chip[aria-pressed="true"] { background: var(--text); color: var(--bg); }
+  .pref { margin-left: auto; font-size: 13px; color: var(--muted); display: flex; gap: 8px; align-items: center; }
+  .pref select { background: var(--fill); color: var(--text); border: 0; border-radius: 8px; padding: 5px 8px; font-size: 13px; }
+
+  /* resultados */
+  #status { color: var(--muted); font-size: 13px; margin: 10px 4px; min-height: 18px; }
+  .res { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+  .item { background: var(--panel); border-radius: 18px; padding: 18px 22px; box-shadow: var(--shadow);
+          transition: box-shadow .2s, transform .2s; }
+  .item:hover { box-shadow: var(--shadow-hover); transform: translateY(-1px); }
+  .top { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+  .tag { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--accent); white-space: nowrap; }
+  .title { font-weight: 600; font-size: 17px; letter-spacing: -.02em; overflow-wrap: anywhere; }
+  .alt { color: var(--muted); font-size: 14px; overflow-wrap: anywhere; }
+  .crumb { color: var(--muted); font-size: 12.5px; margin-top: 3px; overflow-wrap: anywhere; }
+  .desc { font-size: 14px; margin-top: 6px; color: var(--text); opacity: .8; overflow-wrap: anywhere; }
+  mark { background: var(--mark); color: var(--mark-text); border-radius: 4px; padding: 0 2px; }
+  .btns { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; align-items: center; }
+  .btn { display: inline-flex; align-items: center; font-size: 13.5px; font-weight: 500; border-radius: 999px;
+         padding: 6px 15px; color: var(--brand); background: var(--fill); transition: background .15s, filter .15s; }
+  .btn:hover { background: var(--fill-2); text-decoration: none; }
+  .btn.primary { background: var(--brand); color: #fff; }
+  .btn.primary:hover { filter: brightness(1.1); background: var(--brand); }
+  .btn.off { color: var(--muted); background: transparent; padding-left: 4px; cursor: default; font-weight: 400; }
+  .more { display: block; margin: 20px auto 0; }
+
+  /* biblioteca */
+  section.lib { margin: 44px 0 64px; }
+  h2 { font-size: 28px; font-weight: 700; letter-spacing: -.03em; margin: 0 0 6px; }
+  .hint { color: var(--muted); font-size: 14px; margin: 0 0 22px; overflow-wrap: anywhere; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(290px, 100%), 1fr)); gap: 14px; }
+  .card { background: var(--panel); border-radius: 18px; padding: 20px 22px; box-shadow: var(--shadow); }
+  .card h3 { margin: 0 0 10px; font-size: 17px; font-weight: 600; letter-spacing: -.02em; }
+  .card ul { margin: 0; padding: 0; list-style: none; font-size: 14px; }
+  .card li { display: flex; justify-content: space-between; gap: 10px; padding: 8px 0; border-top: 1px solid var(--hair); }
+  .card li:first-child { border-top: 0; padding-top: 0; }
+  .card .na { color: var(--muted); opacity: .6; }
+  .card li > span:last-child { white-space: nowrap; }
+  code { font-size: .95em; background: var(--fill); border-radius: 5px; padding: 1px 5px; }
+  kbd { background: var(--fill); border-radius: 5px; padding: 1px 6px; font-size: 12px; }
+
+  footer { color: var(--muted); font-size: 12px; text-align: center; padding: 22px 20px 40px; border-top: 1px solid var(--hair); max-width: 980px; margin: 0 auto; }
+  footer p { margin: 6px 0 0; }
+  .err { background: #fde8e8; color: #7a1c1c; border-radius: 12px; padding: 14px; }
+  @media (max-width: 560px) { header.wrap { padding-top: 40px; } .sub { font-size: 17px; } .pref { margin-left: 0; } .item, .card { padding: 16px 18px; } }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="wrap">
+    <picture>
+      <source srcset="assets/senai-marca-recortada.png" media="(prefers-color-scheme: dark)">
+      <img class="senai-logo" src="assets/senai-marca-azul.png" alt="SENAI — Serviço Nacional de Aprendizagem Industrial">
+    </picture>
+    <div class="sys"><img src="assets/icon.png" alt=""><span>doc-frog</span></div>
+  </div>
+</div>
+<header class="wrap">
+  <img class="hero-icon" src="assets/icon.png" alt="doc-frog">
+  <h1>doc-<span>frog</span></h1>
+  <p class="sub">Indexador de Documentações oficiais em PDF — pesquise e abra direto na página, em português ou no original em inglês.</p>
+  <p class="sub">Use o índice para encontrar rapidamente a documentação que você precisa offline.</p>
+</header>
+
+<div class="search">
+  <div class="wrap">
+    <div class="box">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="text" autocomplete="off" autofocus
+             placeholder="O que você quer consultar? Ex.: mysqli, array_map, SELECT, flexbox, for loop…" aria-label="Buscar na documentação">
+      <button id="clear" title="Limpar busca" aria-label="Limpar busca">✕</button>
+    </div>
+    <div class="row" id="chips"></div>
+  </div>
+</div>
+
+<main class="wrap">
+  <div id="status"></div>
+  <ul class="res" id="results"></ul>
+  <button class="chip more" id="more" hidden>Mostrar mais resultados</button>
+
+  <section class="lib" id="lib">
+    <h2>Biblioteca</h2>
+    <p class="hint">Todos os PDFs do projeto. Os arquivos ficam em <code>documentacao-original/</code> (inglês) e <code>documentacao-portugues/</code>.
+      Dica: pressione <kbd>/</kbd> para buscar e <kbd>Enter</kbd> para abrir o primeiro resultado.</p>
+    <div class="grid" id="cards"></div>
+  </section>
+</main>
+
+<footer>Desenvolvido com responsabilidade por <a href="https://github.com/seu-usuario/icrcode" target="_blank" rel="noopener noreferrer">@icrcode</a> · conteúdo de original de php.net, MDN Web Docs, docs.python.org, dev.mysql.com, dbeaver.io e apachefriends.org
+
+<br>
+
+<p>Esse indexador possui carater educacional e não comercial.</p>
+</footer>
+
+
+
+<script src="assets/indice.js"></script>
+<script>
+(function () {
+  const TECHS = [
+    ["php", "PHP"], ["javascript", "JavaScript"], ["python", "Python"], ["html", "HTML"],
+    ["mysql", "MySQL"], ["workbench", "MySQL Workbench"], ["dbeaver", "DBeaver"], ["xampp", "XAMPP"]
+  ];
+  const TECH_NAME = Object.fromEntries(TECHS);
+  const $ = (id) => document.getElementById(id);
+  const data = window.DOCFROG;
+  if (!data) {
+    $("status").innerHTML = '<div class="err">Não encontrei <code>assets/indice.js</code>. Mantenha o index.html dentro da pasta doc-frog.</div>';
+    return;
+  }
+  const F = data.files, E = data.e;
+
+  const norm = (s) => (s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  // pré-processa os textos de busca
+  const IDX = E.map((e) => ({ t: norm(e[1] + " ‖ " + e[2]), d: norm(e[3]) }));
+
+  let pref = "pt", tech = "all", shown = 30, lastHits = [];
+  try { pref = localStorage.getItem("docfrog-pref") || "pt"; } catch (_) {}
+
+  // ---------- filtros
+  const chips = $("chips");
+  const mkChip = (val, label) => {
+    const b = document.createElement("button");
+    b.className = "chip"; b.textContent = label; b.dataset.v = val;
+    b.setAttribute("aria-pressed", val === tech);
+    b.onclick = () => { tech = val; chips.querySelectorAll(".chip").forEach((c) => c.setAttribute("aria-pressed", c.dataset.v === tech)); run(); };
+    chips.appendChild(b);
+  };
+  mkChip("all", "Todas");
+  TECHS.forEach(([k, n]) => mkChip(k, n));
+  const pw = document.createElement("label");
+  pw.className = "pref";
+  pw.innerHTML = 'Abrir primeiro em <select id="pref"><option value="pt">Português</option><option value="en">Inglês</option></select>';
+  chips.appendChild(pw);
+  $("pref").value = pref;
+  $("pref").onchange = (ev) => { pref = ev.target.value; try { localStorage.setItem("docfrog-pref", pref); } catch (_) {} render(); };
+
+  // ---------- busca
+  function search(q) {
+    const nq = norm(q).trim();
+    const toks = nq.split(/\s+/).filter(Boolean);
+    if (!toks.length) return [];
+    const hits = [];
+    for (let i = 0; i < E.length; i++) {
+      const e = E[i];
+      if (tech !== "all" && e[0] !== tech) continue;
+      const x = IDX[i];
+      let score = 0, ok = true;
+      for (const t of toks) {
+        const p = x.t.indexOf(t);
+        if (p >= 0) {
+          score += 20;
+          const before = p === 0 ? " " : x.t[p - 1];
+          if (/[^a-z0-9_]/.test(before)) score += 12; // começo de palavra
+          const after = x.t[p + t.length];
+          if (after === undefined || /[^a-z0-9_]/.test(after)) score += 8; // palavra inteira
+        } else if (x.d.indexOf(t) >= 0) {
+          score += 4;
+        } else { ok = false; break; }
+      }
+      if (!ok) continue;
+      const titles = [norm(e[1]), norm(e[2])];
+      if (titles.includes(nq)) score += 80;
+      else if (titles.some((t) => t.startsWith(nq))) score += 35;
+      else if (titles.some((t) => t.includes(nq))) score += 15;
+      if (toks.length > 1 && toks.some((t) => titles.includes(t))) score += 40;
+      const len = Math.min(...titles.filter(Boolean).map((t) => t.length));
+      score -= Math.min(len, 120) * 0.15;
+      hits.push([score, i]);
+    }
+    hits.sort((a, b) => b[0] - a[0] || a[1] - b[1]);
+    return hits.map((h) => h[1]);
+  }
+
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  function hl(text, toks) {
+    const s = String(text);
+    const n = norm(s); // mesmo tamanho na maioria dos casos (acentos removidos após NFD)
+    if (n.length !== s.length || !toks.length) return esc(s);
+    const marks = new Array(s.length).fill(false);
+    for (const t of toks) { let p = n.indexOf(t); while (p >= 0) { for (let k = p; k < p + t.length; k++) marks[k] = true; p = n.indexOf(t, p + t.length); } }
+    let out = "", open = false;
+    for (let k = 0; k < s.length; k++) {
+      if (marks[k] && !open) { out += "<mark>"; open = true; }
+      if (!marks[k] && open) { out += "</mark>"; open = false; }
+      out += esc(s[k]);
+    }
+    return out + (open ? "</mark>" : "");
+  }
+  const crumb = (i) => {
+    const parts = []; let p = E[i][8], guard = 0;
+    while (p >= 0 && guard++ < 8) { const e = E[p]; parts.unshift((pref === "pt" ? e[2] || e[1] : e[1] || e[2])); p = e[8]; }
+    return parts.join(" › ");
+  };
+  const link = (f, page) => encodeURI(F[f].path) + "#page=" + page;
+
+  function button(e, lang, primary) {
+    const f = lang === "en" ? e[4] : e[6], page = lang === "en" ? e[5] : e[7];
+    const label = lang === "en" ? "Inglês (original)" : "Português";
+    if (f < 0) return `<span class="btn off" title="Não existe tradução oficial deste trecho">${label} — ${lang === "pt" ? "sem tradução oficial" : "indisponível"}</span>`;
+    return `<a class="btn${primary ? " primary" : ""}" href="${link(f, page)}" target="_blank" rel="noopener">${label} · p. ${page}</a>`;
+  }
+
+  function render() {
+    const q = $("q").value, toks = norm(q).trim().split(/\s+/).filter(Boolean);
+    const ul = $("results");
+    if (!toks.length) {
+      ul.innerHTML = ""; $("more").hidden = true; $("status").textContent = ""; $("lib").hidden = false; return;
+    }
+    $("lib").hidden = true;
+    $("status").textContent = lastHits.length
+      ? `${lastHits.length} resultado${lastHits.length > 1 ? "s" : ""} para “${q.trim()}”` + (tech !== "all" ? ` em ${TECH_NAME[tech]}` : "")
+      : `Nada encontrado para “${q.trim()}”. Tente outra palavra (em inglês costuma funcionar melhor: ex. "loop", "string", "connect").`;
+    const other = pref === "pt" ? "en" : "pt";
+    ul.innerHTML = lastHits.slice(0, shown).map((i) => {
+      const e = E[i];
+      const main = pref === "pt" ? (e[2] || e[1]) : (e[1] || e[2]);
+      const sec = pref === "pt" ? (e[2] && e[1] && e[1] !== e[2] ? e[1] : "") : (e[1] && e[2] && e[1] !== e[2] ? e[2] : "");
+      const c = crumb(i);
+      const descTxt = e[3] ? e[3].split(" || ")[0] : "";
+      const has = (l) => (l === "en" ? e[4] : e[6]) >= 0;
+      const first = has(pref) ? pref : other;
+      return `<li class="item">
+        <div class="top"><span class="tag">${esc(TECH_NAME[e[0]] || e[0])}</span><span class="title">${hl(main, toks)}</span>
+        ${sec ? `<span class="alt">${hl(sec, toks)}</span>` : ""}</div>
+        <div class="crumb">${esc(F[e[4] >= 0 ? e[4] : e[6]].label)}${c ? " › " + esc(c) : ""}</div>
+        ${descTxt ? `<div class="desc">${hl(descTxt, toks)}</div>` : ""}
+        <div class="btns">${button(e, first, true)}${button(e, first === "pt" ? "en" : "pt", false)}</div>
+      </li>`;
+    }).join("");
+    $("more").hidden = lastHits.length <= shown;
+  }
+
+  let timer;
+  function run() { shown = 30; lastHits = search($("q").value); render(); }
+  $("q").addEventListener("input", () => { $("clear").style.visibility = $("q").value ? "visible" : "hidden"; clearTimeout(timer); timer = setTimeout(run, 120); });
+  $("q").addEventListener("keydown", (ev) => {
+    if (ev.key === "Enter") { clearTimeout(timer); run(); const a = document.querySelector("#results .btn.primary"); if (a) a.click(); }
+    if (ev.key === "Escape") { $("q").value = ""; run(); $("clear").style.visibility = "hidden"; }
+  });
+  $("clear").onclick = () => { $("q").value = ""; $("clear").style.visibility = "hidden"; run(); $("q").focus(); };
+  $("more").onclick = () => { shown += 30; render(); };
+  document.addEventListener("keydown", (ev) => { if (ev.key === "/" && document.activeElement !== $("q")) { ev.preventDefault(); $("q").focus(); } });
+
+  // ---------- biblioteca
+  const byTech = {};
+  F.forEach((f, i) => { (byTech[f.tech] = byTech[f.tech] || []).push(i); });
+  $("cards").innerHTML = TECHS.map(([k, n]) => {
+    const list = byTech[k] || [];
+    const labels = [...new Set(list.map((i) => F[i].label))];
+    const rows = labels.map((lb) => {
+      const en = list.find((i) => F[i].label === lb && F[i].lang === "en");
+      const pt = list.find((i) => F[i].label === lb && F[i].lang === "pt");
+      const a = (i, t) => i === undefined ? `<span class="na">${t} —</span>` : `<a href="${encodeURI(F[i].path)}" target="_blank" rel="noopener">${t}</a>`;
+      return `<li><span>${esc(lb)}</span><span>${a(pt, "PT")} · ${a(en, "EN")}</span></li>`;
+    }).join("");
+    return `<div class="card"><h3>${esc(n)}</h3><ul>${rows || '<li class="na">Nenhum PDF</li>'}</ul></div>`;
+  }).join("");
+
+  // busca via URL: index.html?q=mysqli
+  const qs = new URLSearchParams(location.search).get("q");
+  if (qs) { $("q").value = qs; $("clear").style.visibility = "visible"; run(); }
+})();
+</script>
+</body>
+</html>
