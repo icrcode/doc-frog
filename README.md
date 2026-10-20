@@ -30,7 +30,7 @@ Não precisa de internet, servidor nem instalação.
 
 ## Estrutura
 
-```
+```bash
 doc-frog/
 ├── index.html                 # página de busca
 ├── assets/                    # índice de busca, logos e ícone
