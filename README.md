@@ -10,6 +10,7 @@ O aluno digita o que procura (por exemplo `mysqli`, `array_map`, `SELECT` ou `fo
 - JavaScript
 - Python
 - HTML
+- CSS
 - MySQL
 - MySQL Workbench
 - DBeaver
