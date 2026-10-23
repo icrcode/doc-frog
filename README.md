@@ -40,7 +40,7 @@ doc-frog/
 
 ## Licença e Download
 
-[Baixar](/icrcode/doc-frog/archive/refs/heads/main.zip)
+[Baixar](https://github.com/icrcode/doc-frog/archive/refs/heads/main.zip)
 
 O doc-frog é software livre, distribuído sob a licença **GNU General Public License v3.0 (GPL-3.0)**. Você pode usar, estudar, modificar e compartilhar, desde que mantenha a mesma licença.
 
